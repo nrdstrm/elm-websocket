@@ -6,5 +6,6 @@
   "scripts": {},
   "devDependencies": {
     "elm": "^0.18.0",
+    "elm-format": "^0.6.1-alpha",
   }
 }
