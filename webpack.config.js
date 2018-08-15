@@ -1,15 +1,20 @@
 var path = require("path");
+var webpack = require("webpack");
 var HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
+    mode: "development",
+
     entry: {
         app: [
             "./src/static/index.js",
+            "webpack-hot-middleware/client",
         ]
     },
 
     output: {
         path: path.resolve(__dirname + "/dist"),
+        publicPath: "/",
         filename: "[name].js",
     },
 
@@ -23,6 +28,8 @@ module.exports = {
             test: /\.elm$/,
             exclude: [/elm-stuff/, /node_modules/],
             use: [{
+                loader: 'elm-hot-loader'
+            }, {
                 loader: "elm-webpack-loader",
                 options: {
                     verbose: true,
@@ -41,15 +48,7 @@ module.exports = {
             inject: "body",
             filename: "index.html",
         }),
+        new webpack.optimize.OccurrenceOrderPlugin(),
+        new webpack.HotModuleReplacementPlugin(),
     ],
-
-    devServer: {
-        inline: true,
-        historyApiFallback: true,
-        contentBase: "./src",
-        hot: true,
-        stats: {
-            colors: true,
-        },
-    },
 };
