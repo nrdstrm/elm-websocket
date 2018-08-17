@@ -1,13 +1,14 @@
-var http = require("http");
-var path = require("path");
+const http = require("http");
+const path = require("path");
 
-var express = require("express");
-var webpack = require("webpack");
+const express = require("express");
+const WebSocket = require("ws").Server;
 
-var webpackConfig = require("../webpack.config");
-var compiler = webpack(webpackConfig);
+const webpack = require("webpack");
+const webpackConfig = require("../webpack.config");
+const compiler = webpack(webpackConfig);
 
-var app = express();
+const app = express();
 
 app.use(require("webpack-dev-middleware")(compiler, {
     noInfo: true,
@@ -24,7 +25,7 @@ var port = process.env.PORT || "3000";
 
 app.set("port", port);
 
-http.createServer(app)
+const server = http.createServer(app)
     .listen(port, function () {
         console.log(`server started`);
     })
@@ -37,3 +38,17 @@ http.createServer(app)
     .on("connection", function () {
         console.log(`connection opened`);
     });
+
+const socket = new WebSocket({
+    server,
+    path: "/server",
+});
+
+socket.on("connection", (ws) => {
+
+    ws.on("message", (msg) => {
+        ws.send(`bounce -> ${msg}`);
+    });
+
+    ws.send("connected");
+});
